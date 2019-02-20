@@ -9,7 +9,6 @@ import org.frc5687.deepspace.robot.Robot;
 import org.frc5687.deepspace.robot.RobotMap;
 import org.frc5687.deepspace.robot.commands.DriveArm;
 import org.frc5687.deepspace.robot.utils.HallEffect;
-import org.frc5687.deepspace.robot.utils.MetricTracker;
 
 public class Arm extends OutliersSubsystem implements PIDSource {
 
@@ -45,12 +44,13 @@ public class Arm extends OutliersSubsystem implements PIDSource {
         _secureHall = new HallEffect(RobotMap.DIO.ARM_SECURE_HALL);
         _stowedHall = new HallEffect(RobotMap.DIO.ARM_STOWED_HALL);
 
-        _metricTracker.registerReportableMetricName("ElvisWeight");
-        _metricTracker.registerReportableMetricName("ElvisStatus");
-        // Example of metrics collection.
-        // _metricTracker.registerReportableMetricName("foo");
-        // _metricTracker.registerReportableMetricName("bar");
-        // _metricTracker.registerReportableMetricName("baz");
+        getMetricTracker().registerReportableMetricName("ElvisWeight");
+        getMetricTracker().registerReportableMetricName("ElvisStatus");
+
+        // Example of metrics collection for report.
+        // getMetricTracker().registerReportableMetricName("foo");
+        // getMetricTracker().registerReportableMetricName("bar");
+        // getMetricTracker().registerReportableMetricName("baz");
         //
         // Later on...
         // metric("foo", 123);
@@ -86,8 +86,8 @@ public class Arm extends OutliersSubsystem implements PIDSource {
                 speed = 0;
             }
         }
-        //metric("rawSpeed", desiredSpeed);
-        //metric("speed", speed);
+        metric("rawSpeed", desiredSpeed);
+        metric("speed", speed);
         if (_arm==null) { return; }
         _arm.set(speed);
     }
@@ -102,12 +102,12 @@ public class Arm extends OutliersSubsystem implements PIDSource {
         metric("ElvisWeight", 400);
         metric("ElvisStatus", "Dead");
 
-        //metric("LowHall", _lowHall.get());
-        //metric("IntakeHall", _intakeHall.get());
-        //metric("SecureHall", _secureHall.get());
-        //metric("StowedHall", _stowedHall.get());
+        metric("LowHall", _lowHall.get());
+        metric("IntakeHall", _intakeHall.get());
+        metric("SecureHall", _secureHall.get());
+        metric("StowedHall", _stowedHall.get());
         if (_shoulderEncoder==null) { return; }
-        //metric("Encoder", getPosition());
+        metric("Encoder", getPosition());
     }
 
     public boolean isStowed() { return _stowedHall.get(); }

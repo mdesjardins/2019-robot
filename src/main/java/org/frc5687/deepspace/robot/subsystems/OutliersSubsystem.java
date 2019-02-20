@@ -1,6 +1,5 @@
 package org.frc5687.deepspace.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.frc5687.deepspace.robot.utils.ILoggingSource;
@@ -8,7 +7,7 @@ import org.frc5687.deepspace.robot.utils.MetricTracker;
 import org.frc5687.deepspace.robot.utils.RioLogger;
 
 public abstract class OutliersSubsystem extends Subsystem implements ILoggingSource {
-    protected MetricTracker _metricTracker = MetricTracker.createMetricTracker(this);
+    private MetricTracker _metricTracker = MetricTracker.createMetricTracker(this);
 
     @Override
     public void error(String message) {
@@ -28,6 +27,10 @@ public abstract class OutliersSubsystem extends Subsystem implements ILoggingSou
     @Override
     public void debug(String message) {
         RioLogger.debug(this, message);
+    }
+
+    MetricTracker getMetricTracker() {
+        return _metricTracker;
     }
 
     public void metric(String name, String value) {

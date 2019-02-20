@@ -1,8 +1,5 @@
 package org.frc5687.deepspace.robot.utils;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import org.frc5687.deepspace.robot.commands.Drive;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,7 +11,6 @@ public class MetricTracker {
     private List<String> _reportableMetricNames = new ArrayList<>();
     private Map<String, Object> _rowMetrics = new HashMap<>();
     private static List<MetricTracker> _allMetricsTrackers = new ArrayList<>();
-    private String _instrumentedClassName;
     private boolean _streamOpen = false;
     private BufferedWriter _bufferedWriter;
 
@@ -24,9 +20,8 @@ public class MetricTracker {
      */
     private MetricTracker(String instrumentedClassName, boolean header) {
         // Don't use the c'tor. Use createMetricTracker.
-        _instrumentedClassName = instrumentedClassName;
         String outputDir = "/U/"; // USB drive is mounted to /U on roboRIO
-        String filename = outputDir + "metrics_" + this._instrumentedClassName + "_" + getDateTimeString() + ".csv";
+        String filename = outputDir + "metrics_" + instrumentedClassName + "_" + getDateTimeString() + ".csv";
 
         try {
             _bufferedWriter = new BufferedWriter(new FileWriter(filename, true));
@@ -86,10 +81,9 @@ public class MetricTracker {
             return;
         }
         try {
-            DriverStation.getInstance().reportWarning(">>>>> WRITING A NEW METRIC ROW " + buildMetricRow(), false);
             _bufferedWriter.write(buildMetricRow());
             _bufferedWriter.newLine();
-            _rowMetrics.clear();
+            _rowMetrics = new HashMap<>();
         } catch (IOException e) {
             System.out.println("Error writing metrics file: " + e.getMessage());
         }
@@ -99,9 +93,7 @@ public class MetricTracker {
      * Starts a new row for all instrumented objects. You'd call this, e.g., once per loop.
      */
     public static void newMetricRowAll() {
-        for(MetricTracker metricTracker : MetricTracker._allMetricsTrackers) {
-            metricTracker.newMetricRow();
-        }
+        MetricTracker._allMetricsTrackers.forEach(MetricTracker::newMetricRow);
     }
 
     /**
@@ -109,10 +101,7 @@ public class MetricTracker {
      */
     public static void flushAll() {
         newMetricRowAll();
-        for (MetricTracker metricTracker : MetricTracker._allMetricsTrackers) {
-            DriverStation.getInstance().reportError(">>>>>>>>>>> METRIC TRACKER IS " + metricTracker._instrumentedClassName, false);
-            metricTracker.flushMetricsTracker();
-        }
+        MetricTracker._allMetricsTrackers.forEach(MetricTracker::flushMetricsTracker);
     }
 
     /**
@@ -132,7 +121,6 @@ public class MetricTracker {
     private String buildMetricRow() {
         StringBuilder sb = new StringBuilder();
         int i = 0;
-        System.out.println(">>>>>>>>>>>>>>> " + _rowMetrics.toString());
         for (String name : _reportableMetricNames) {
             sb.append("\"");
             if (_rowMetrics.get(name) == null) {
@@ -150,7 +138,7 @@ public class MetricTracker {
 
     // Formats a row of metric names as a string.
     private String buildHeaderRow() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 0;
         for (String name : _reportableMetricNames) {
             sb.append(name);
